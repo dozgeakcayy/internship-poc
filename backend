@@ -1,0 +1,3 @@
+mkdir Backend
+cd Backend
+dotnet new webapi -n InternshipAPI

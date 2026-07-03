@@ -1,0 +1,8 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-compose
+    environment:
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
