@@ -1,5 +1,6 @@
 using InternshipAPI.Data;
 using InternshipAPI.Models;
+using InternshipAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,20 +11,22 @@ namespace InternshipAPI.Controllers;
 public class NotificationsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly RabbitMqService _rabbitMqService;
 
-    public NotificationsController(ApplicationDbContext context)
+    public NotificationsController(
+        ApplicationDbContext context,
+        RabbitMqService rabbitMqService)
     {
         _context = context;
+        _rabbitMqService = rabbitMqService;
     }
 
-    // GET: api/notifications
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Notification>>> GetNotifications()
     {
         return await _context.Notifications.ToListAsync();
     }
 
-    // POST: api/notifications
     [HttpPost]
     public async Task<ActionResult<Notification>> CreateNotification(Notification notification)
     {
@@ -33,6 +36,9 @@ public class NotificationsController : ControllerBase
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetNotifications), new { id = notification.Id }, notification);
+        _rabbitMqService.SendMessage(notification.Message);
+
+        return CreatedAtAction(nameof(GetNotifications),
+            new { id = notification.Id }, notification);
     }
 }
