@@ -1,3 +1,4 @@
+using InternshipAPI.Services;
 using InternshipAPI.Data;
 using InternshipAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Services
 builder.Services.AddSingleton<RabbitMqService>();
-
+builder.Services.AddHostedService<RabbitMqConsumer>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
