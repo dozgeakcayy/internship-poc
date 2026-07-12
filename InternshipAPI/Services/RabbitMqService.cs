@@ -1,11 +1,13 @@
+using InternshipAPI.Models;
 using RabbitMQ.Client;
 using System.Text;
+using System.Text.Json;
 
 namespace InternshipAPI.Services;
 
 public class RabbitMqService
 {
-    public void SendMessage(string message)
+    public void Publish(Notification notification)
     {
         var factory = new ConnectionFactory()
         {
@@ -22,14 +24,14 @@ public class RabbitMqService
             autoDelete: false,
             arguments: null);
 
-        var body = Encoding.UTF8.GetBytes(message);
+        var json = JsonSerializer.Serialize(notification);
+        var body = Encoding.UTF8.GetBytes(json);
 
         channel.BasicPublish(
             exchange: "",
             routingKey: "notifications",
-            basicProperties: null,
             body: body);
 
-        Console.WriteLine($"Message sent: {message}");
+        Console.WriteLine($"Published: {json}");
     }
 }

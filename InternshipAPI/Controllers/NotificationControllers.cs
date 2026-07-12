@@ -36,7 +36,7 @@ public class NotificationsController : ControllerBase
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
 
-        _rabbitMqService.SendMessage(notification.Message);
+        _rabbitMqService.Publish(notification);
 
         return CreatedAtAction(nameof(GetNotifications),
             new { id = notification.Id }, notification);
