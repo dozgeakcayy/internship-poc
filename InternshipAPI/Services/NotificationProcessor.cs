@@ -4,12 +4,14 @@ namespace InternshipAPI.Services;
 
 public class NotificationProcessor
 {
-    public void Process(Notification notification)
+    public Task Process(NotificationEnvelope notification)
     {
         Console.WriteLine("================================");
         Console.WriteLine($"Source : {notification.Source}");
         Console.WriteLine($"Message: {notification.Message}");
-        Console.WriteLine($"Created: {notification.CreatedAt}");
+        Console.WriteLine($"Received: {notification.ReceivedAt}");
         Console.WriteLine("================================");
+
+        return Task.CompletedTask;
     }
 }
