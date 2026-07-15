@@ -15,6 +15,8 @@ public class ConnectorService : IConnector
 
         adapter.OnRawMessage += async raw =>
         {
+            Console.WriteLine($"[{raw.Adapter}] Raw message received.");
+
             var envelope = new NotificationEnvelope
             {
                 Source = raw.Adapter,
