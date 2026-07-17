@@ -11,6 +11,8 @@ public class ConnectorService : IConnector
 
     public void Register(ISourceAdapter adapter)
     {
+        Console.WriteLine($"Adapter Registered: {adapter.Name}");
+
         _adapters.Add(adapter);
 
         adapter.OnRawMessage += async raw =>
@@ -33,22 +35,30 @@ public class ConnectorService : IConnector
 
     public void Unregister(ISourceAdapter adapter)
     {
+        Console.WriteLine($"Adapter Unregistered: {adapter.Name}");
         _adapters.Remove(adapter);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Total registered adapters: {_adapters.Count}");
+        Console.WriteLine("Starting all registered adapters...");
+
         foreach (var adapter in _adapters)
         {
             await adapter.ConnectAsync(cancellationToken);
+            Console.WriteLine($"{adapter.Name} started.");
         }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine("Stopping adapters...");
+
         foreach (var adapter in _adapters)
         {
             await adapter.DisconnectAsync(cancellationToken);
+            Console.WriteLine($"{adapter.Name} stopped.");
         }
     }
 }
