@@ -22,6 +22,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<FakeAdapter>();
+builder.Services.AddSingleton<WebhookAdapter>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
