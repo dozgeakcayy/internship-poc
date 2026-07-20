@@ -1,3 +1,4 @@
+using InternshipAPI.Models;
 using InternshipAPI.Data;
 using InternshipAPI.Interfaces;
 using InternshipAPI.Services;
@@ -21,6 +22,10 @@ builder.Services.AddSingleton<WebSocketAdapter>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<ConnectorOptions>(
+    builder.Configuration.GetSection("Connector")); 
+
 builder.Services.AddSingleton<FakeAdapter>();
 builder.Services.AddSingleton<WebhookAdapter>();
 var app = builder.Build();

@@ -17,13 +17,20 @@ public class RabbitMqAdapter : ISourceAdapter
 
     public Task ConnectAsync(CancellationToken cancellationToken)
     {
-        var factory = new ConnectionFactory()
+        Console.WriteLine("Connecting to RabbitMQ...");
+
+        var factory = new ConnectionFactory
         {
-            HostName = "localhost"
+            HostName = "localhost",
+            Port = 5672,
+            UserName = "guest",
+            Password = "guest"
         };
 
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
+
+        Console.WriteLine("RabbitMQ connection established.");
 
         _channel.QueueDeclare(
             queue: "notifications",
@@ -32,12 +39,16 @@ public class RabbitMqAdapter : ISourceAdapter
             autoDelete: false,
             arguments: null);
 
+        Console.WriteLine("Queue declared.");
+
         var consumer = new EventingBasicConsumer(_channel);
 
         consumer.Received += async (model, ea) =>
         {
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
+
+            Console.WriteLine($"RabbitMQ Message Received: {message}");
 
             var rawMessage = new RawMessage
             {
