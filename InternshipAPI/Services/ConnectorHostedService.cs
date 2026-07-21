@@ -13,6 +13,7 @@ public class ConnectorHostedService : BackgroundService
     private readonly WebSocketAdapter _webSocketAdapter;
     private readonly WebhookAdapter _webhookAdapter;
     private readonly ConnectorOptions _options;
+    private readonly RedisAdapter _redisAdapter;
 
     public ConnectorHostedService(
         IConnector connector,
@@ -20,7 +21,8 @@ public class ConnectorHostedService : BackgroundService
         NotificationProcessor processor,
         WebSocketAdapter webSocketAdapter,
         WebhookAdapter webhookAdapter,
-        IOptions<ConnectorOptions> options)
+        IOptions<ConnectorOptions> options,
+        RedisAdapter redisAdapter)
     {
         _connector = connector;
         _rabbitMqAdapter = rabbitMqAdapter;
@@ -28,6 +30,8 @@ public class ConnectorHostedService : BackgroundService
         _webSocketAdapter = webSocketAdapter;
         _webhookAdapter = webhookAdapter;
         _options = options.Value;
+        _redisAdapter = redisAdapter;
+        
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -47,6 +51,9 @@ public class ConnectorHostedService : BackgroundService
             case "Webhook":
                 _connector.Register(_webhookAdapter);
                 break;
+            case "Redis":
+                _connector.Register(_redisAdapter);
+                 break;
 
             default:
                 throw new Exception("Unknown connector provider.");
