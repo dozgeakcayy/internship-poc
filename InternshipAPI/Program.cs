@@ -24,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<RedisAdapter>();
 builder.Services.AddSingleton<RedisPublisherService>();
+builder.Services.AddSingleton<HealthCheckService>();
 
 builder.Services.Configure<ConnectorOptions>(
 builder.Configuration.GetSection("Connector")); 

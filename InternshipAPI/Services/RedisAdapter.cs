@@ -17,10 +17,7 @@ public class RedisAdapter : ISourceAdapter
     {
         Console.WriteLine("Connecting to Redis...");
 
-        var options = ConfigurationOptions.Parse("localhost:6379");
-        options.AbortOnConnectFail = false;
-
-        _redis = await ConnectionMultiplexer.ConnectAsync(options);
+        _redis = await ConnectionMultiplexer.ConnectAsync("localhost:6379");
 
         _subscriber = _redis.GetSubscriber();
 
@@ -28,18 +25,34 @@ public class RedisAdapter : ISourceAdapter
             RedisChannel.Literal("notifications"),
             async (channel, message) =>
             {
-                Console.WriteLine($"[Redis] Message received: {message}");
-
-                if (OnRawMessage != null)
+                try
                 {
-                    await OnRawMessage(new RawMessage
+                    Console.WriteLine($"[Redis] Message received: {message}");
+
+                    if (string.IsNullOrWhiteSpace(message))
                     {
-                        Adapter = Name,
-                        Payload = message!
-                    });
+                        Console.WriteLine("[Redis] Empty message ignored.");
+                        return;
+                    }
+
+                    if (OnRawMessage != null)
+                    {
+                        Console.WriteLine("[Redis] Raw message received.");
+
+                        await OnRawMessage(new RawMessage
+                        {
+                            Adapter = Name,
+                            Payload = message.ToString()
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Redis] Error while processing message: {ex.Message}");
                 }
             });
 
+        Console.WriteLine($"[{DateTime.Now}] Redis connection established.");
         Console.WriteLine("Subscribed to Redis channel: notifications");
         Console.WriteLine("Waiting for Redis messages...");
         Console.WriteLine("Redis Adapter Connected");
