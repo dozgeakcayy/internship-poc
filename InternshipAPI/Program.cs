@@ -23,9 +23,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<RedisAdapter>();
+builder.Services.AddSingleton<RedisPublisherService>();
 
 builder.Services.Configure<ConnectorOptions>(
-    builder.Configuration.GetSection("Connector")); 
+builder.Configuration.GetSection("Connector")); 
 
 builder.Services.AddSingleton<FakeAdapter>();
 builder.Services.AddSingleton<WebhookAdapter>();
