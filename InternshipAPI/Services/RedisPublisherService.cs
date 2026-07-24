@@ -15,7 +15,9 @@ public class RedisPublisherService
 
     public async Task PublishAsync(string message)
     {
-        await _subscriber.PublishAsync("notifications", message);
+       await _subscriber.PublishAsync(
+           RedisChannel.Literal("notifications"),
+           message);
 
         Console.WriteLine($"Published to Redis: {message}");
     }
