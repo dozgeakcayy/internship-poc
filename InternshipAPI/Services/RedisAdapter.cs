@@ -17,7 +17,39 @@ public class RedisAdapter : ISourceAdapter
     {
         Console.WriteLine("Connecting to Redis...");
 
-        _redis = await ConnectionMultiplexer.ConnectAsync("localhost:6379");
+        var options = new ConfigurationOptions
+        {
+            EndPoints = { "localhost:6379" },
+            AbortOnConnectFail = false,
+            ConnectRetry = 5,
+            ConnectTimeout = 5000,
+            SyncTimeout = 5000,
+            ReconnectRetryPolicy = new ExponentialRetry(5000)
+        };
+
+        _redis = await ConnectionMultiplexer.ConnectAsync(options);
+
+        _redis.ConnectionFailed += (_, e) =>
+        {
+            Console.WriteLine($"[Redis] Connection failed: {e.Exception?.Message}");
+        };
+
+        _redis.ConnectionRestored += (_, e) =>
+        {
+            Console.WriteLine("[Redis] Connection restored.");
+        };
+
+        _redis.ErrorMessage += (_, e) =>
+        {
+            Console.WriteLine($"[Redis] Error: {e.Message}");
+        };
+
+        _redis.InternalError += (_, e) =>
+        {
+            Console.WriteLine($"[Redis] Internal error: {e.Exception.Message}");
+        };
+
+        Console.WriteLine($"[{DateTime.Now}] Redis connection established.");
 
         _subscriber = _redis.GetSubscriber();
 
@@ -52,7 +84,6 @@ public class RedisAdapter : ISourceAdapter
                 }
             });
 
-        Console.WriteLine($"[{DateTime.Now}] Redis connection established.");
         Console.WriteLine("Subscribed to Redis channel: notifications");
         Console.WriteLine("Waiting for Redis messages...");
         Console.WriteLine("Redis Adapter Connected");
@@ -68,6 +99,7 @@ public class RedisAdapter : ISourceAdapter
         if (_redis != null)
         {
             await _redis.CloseAsync();
+            await _redis.DisposeAsync();
         }
 
         Console.WriteLine("Redis Adapter Disconnected");
