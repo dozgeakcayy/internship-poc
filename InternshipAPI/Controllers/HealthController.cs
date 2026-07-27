@@ -4,28 +4,32 @@ using Microsoft.AspNetCore.Mvc;
 namespace InternshipAPI.Controllers;
 
 [ApiController]
-[Route("health")]
+[Route("api/[controller]")]
 public class HealthController : ControllerBase
 {
     private readonly HealthCheckService _health;
+    private readonly MessageBufferService _buffer;
 
-    public HealthController(HealthCheckService health)
+    public HealthController(
+        HealthCheckService health,
+        MessageBufferService buffer)
     {
         _health = health;
+        _buffer = buffer;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public IActionResult Get()
     {
-        var redis = await _health.CheckRedisAsync();
-        var rabbit = _health.CheckRabbitMq();
-
         return Ok(new
         {
-            Redis = redis ? "Connected" : "Disconnected",
-            RabbitMQ = rabbit ? "Connected" : "Disconnected",
-            Status = (redis && rabbit) ? "Healthy" : "Unhealthy",
-            Time = DateTime.Now
+            status = _health.Status,
+            redis = _health.RedisConnected,
+            rabbitMq = _health.RabbitMqConnected,
+            webSocket = _health.WebSocketConnected,
+            webhook = _health.WebhookConnected,
+            bufferedMessages = _buffer.Count,
+            timestamp = DateTime.UtcNow
         });
     }
 }

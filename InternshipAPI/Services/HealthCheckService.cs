@@ -1,38 +1,20 @@
-using RabbitMQ.Client;
-using StackExchange.Redis;
-
 namespace InternshipAPI.Services;
 
 public class HealthCheckService
 {
-    public async Task<bool> CheckRedisAsync()
-    {
-        try
-        {
-            var redis = await ConnectionMultiplexer.ConnectAsync("localhost:6379");
-            return redis.IsConnected;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    public bool RedisConnected { get; set; }
 
-    public bool CheckRabbitMq()
-    {
-        try
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = "localhost"
-            };
+    public bool RabbitMqConnected { get; set; }
 
-            using var connection = factory.CreateConnection();
-            return connection.IsOpen;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    public bool WebSocketConnected { get; set; }
+
+    public bool WebhookConnected { get; set; }
+
+    public string Status =>
+        RedisConnected ||
+        RabbitMqConnected ||
+        WebSocketConnected ||
+        WebhookConnected
+            ? "Healthy"
+            : "Unhealthy";
 }

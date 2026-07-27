@@ -64,10 +64,18 @@ public class ConnectorHostedService : BackgroundService
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
-    public override async Task StopAsync(CancellationToken cancellationToken)
-    {
-        await _connector.StopAsync(cancellationToken);
+   public override async Task StopAsync(CancellationToken cancellationToken)
+{
+    Console.WriteLine("================================");
+    Console.WriteLine("Application shutdown initiated...");
+    Console.WriteLine("Stopping registered adapters...");
 
-        await base.StopAsync(cancellationToken);
-    }
+    await _connector.StopAsync(cancellationToken);
+
+    Console.WriteLine("All adapters stopped successfully.");
+    Console.WriteLine("Shutdown completed.");
+    Console.WriteLine("================================");
+
+    await base.StopAsync(cancellationToken);
+}
 }

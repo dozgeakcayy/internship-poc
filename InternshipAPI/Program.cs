@@ -25,7 +25,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<RedisAdapter>();
 builder.Services.AddSingleton<RedisPublisherService>();
 builder.Services.AddSingleton<HealthCheckService>();
-
+builder.Services.AddSingleton<RedisPublisherService>();
+builder.Services.AddSingleton<NotificationStoreService>();
+builder.Services.AddSingleton<MessageBufferService>();
 builder.Services.Configure<ConnectorOptions>(
 builder.Configuration.GetSection("Connector")); 
 

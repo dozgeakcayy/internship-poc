@@ -2,7 +2,7 @@ namespace InternshipAPI.Models;
 
 public class Notification
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Source { get; set; } = "";
 
