@@ -1,3 +1,4 @@
+using InternshipAPI.Models;
 using InternshipAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +16,14 @@ public class RedisController : ControllerBase
     }
 
     [HttpPost("publish")]
-    public async Task<IActionResult> Publish([FromBody] string message)
+    public async Task<IActionResult> Publish([FromBody] PublishRequest request)
     {
-        await _publisher.PublishAsync(message);
+        await _publisher.PublishAsync(request.Message);
 
         return Ok(new
         {
             Message = "Published successfully",
-            Payload = message
+            Payload = request.Message
         });
     }
 }
